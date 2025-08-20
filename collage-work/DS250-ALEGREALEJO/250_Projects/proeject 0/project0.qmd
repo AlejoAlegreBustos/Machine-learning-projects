@@ -1,0 +1,94 @@
+---
+title: "Client Report - Introduction"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+### Enhancing Company Performance with Data Analysis Tools.
+
+How can we build a bright future for our company? By using tech tools that shape the future. In this presentation, I will show you why we need to use Pandas and let_plot to enhance our company’s performance, using the Penguins dataset as a simple example.
+
+### Elevator pitch
+
+ 
+Dear Mr. Comeau,
+
+I would like to share some insights about two powerful tools I am currently exploring: Pandas and lets_plot. These tools have been highly tested and can significantly enhance our department's accuracy. I've been working with these tools and have found that we can use them to identify the factors that have caused our profits to change dramatically. In just a few minutes, I can send you a detailed report of my work.
+
+### Data
+
+This is the data I've been working with; it's about penguins, but it doesn't matter what it is. What matters is what we have already done in our department with this kind of data.
+```{python}
+import pandas as pd  
+
+from palmerpenguins import load_penguins  
+
+from lets_plot import * 
+
+LetsPlot.setup_html()  
+
+penguins = load_penguins()  
+penguins.head()
+```
+
+
+
+### Old technology
+
+ We have been working with this type of chart—this one, for example—without colors, line trends, or shapes to differentiate our variables. We can discuss and share thoughts about what this chart conveys, but we are unable to identify any trends.
+
+```{python}
+(
+    ggplot(data=penguins, mapping=aes(x="flipper_length_mm", y="body_mass_g")) 
+    + geom_point() 
+)
+
+```
+
+### The Right Way
+
+This one is another level. By using Pandas and lets_plot, I was able not only to differentiate our variables with colors and shapes but also to find a trend: the longer the flipper, the higher the body mass of the penguin. Now, this might not be the exact insight that will change our business, but imagine the patterns we could uncover in our own data. We could figure out why our profits drop during the winter or why allowing employees to work remotely increases our taxes. All these questions could be answered with this technology.
+
+```{python}
+(
+    ggplot(data=penguins, mapping=aes(x="flipper_length_mm", y="body_mass_g"))  
+    + geom_point(aes(color="species", shape="species"))  
+    + geom_smooth(method="lm")  
+    
+    + labs(
+        title="Body mass and flipper length",  # Adding a title to the plot.
+        
+        subtitle="Dimensions for Adelie, Chinstrap, and Gentoo Penguins",  
+
+        x="Flipper length (mm)",  
+        
+        y="Body mass (g)",  
+        
+        color="Species", 
+        
+        shape="Species",  
+    )
+)
+
+```

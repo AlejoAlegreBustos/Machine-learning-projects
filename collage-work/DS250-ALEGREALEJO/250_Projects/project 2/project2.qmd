@@ -1,0 +1,311 @@
+---
+title: "Client Report - Project 2"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from lets_plot import * 
+
+LetsPlot.setup_html()  
+df=pd.read_json('https://raw.githubusercontent.com/byuidatascience/data4missing/master/data-raw/flights_missing/flights_missing.json')
+
+
+#######cleaning
+values={
+  'n/a':np.nan,
+  ' ':np.nan,
+  '  ':np.nan,
+  '   ':np.nan,
+  np.nan:np.nan,
+  -999:np.nan
+}
+df=df.replace(values)
+df = df.apply(lambda col: col.str.replace('+', '', regex=False)if col.dtype == 'object' else col)
+
+df[ 'airport_name'] = df['airport_name'].str.split(':', expand=True)[1]
+df.reset_index()
+def fill_names(row):
+    if row['airport_code'] == "ATL" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'Hartsfield-Jackson Atlanta International'
+    elif row['airport_code'] == "DEN" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'Denver International'
+    elif row['airport_code'] == "ORD" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'Chicago O\'Hare International'
+    elif row['airport_code'] == "SAN" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'San Diego International'
+    elif row['airport_code'] == "SFO" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'San Francisco International'
+    elif row['airport_code'] == "SLC" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'Salt Lake City International'
+    elif row['airport_code'] == "IAD" and (pd.isna(row['airport_name']) or row['airport_name'] == ''):
+        return 'Washington Dulles International'
+    
+    return row['airport_name']
+
+df['airport_name'] = df.apply(fill_names, axis=1)
+df['airport_name'] = df['airport_name'].str.strip()
+df['num_of_delays_carrier']=df['num_of_delays_carrier'].astype(int)
+
+
+```
+### Speech
+
+Mrs. Comeau, I want to share some observations from my analysis of the 2013 flight data. I’ve been looking at delays across different airports and how the weather impacts them. For example, at San Francisco International Airport, 1 in 10 flights is delayed due to weather, which is the highest average in the dataset. In contrast, at Hartsfield-Jackson Atlanta International Airport, which handles more flights, the delays due to weather are less than 1%. This analysis highlights the variability in delays and the influence of weather. Using tools like Let's Plot and pandas, we can create interactive visualizations that make it easier to understand these trends, ultimately improving our decisions and business strategies.
+
+
+### QUESTION 1
+
+Fix all of the varied missing data types in the data to be consistent (all missing values should be displayed as “NaN”). In your report include one record example (one row) from your new data, in the raw JSON format. Your example should display the “NaN” for at least one missing value. 
+
+```{python}
+Nan_row=df.loc[df['num_of_delays_late_aircraft'].isna()].head(1)
+json_output=Nan_row.to_json(indent=4)
+print(json_output.replace('null','NaN'))
+```
+
+### QUESTION 2
+Which airport has the worst delays? Describe the metric you chose, and why you chose it to determine the “worst” airport. Your answer should include a summary table that lists (for each airport) the total number of flights, total number of delayed flights, proportion of delayed flights, and average delay time in hours.
+
+According to my calculations, Jackson Atlanta International Airport has the highest proportion of delayed flights. Specifically, for every 100 flights, 6 experience delays at this airport, which means 6% of flights are affected, although flights can't be split. Additionally, the average delay duration is approximately 30 minutes.
+
+```{python}
+
+summary_table = (
+    df.groupby('airport_name')
+    .agg(
+        airport_code=('airport_code', 'min'),
+        total_num_of_flights=('num_of_flights_total', 'sum'),
+        total_num_of_delayed_flights=('num_of_delays_total', 'sum'),
+        proportion_of_delayed_flights=('num_of_delays_total', lambda x: (x.sum() / df['num_of_flights_total'].sum()).round(2)),
+        average_delay_time_in_hours=('minutes_delayed_total', lambda x: ((x.sum() / 60) / df['num_of_delays_total'].sum()).round(2))
+    )
+    .sort_values(['proportion_of_delayed_flights','average_delay_time_in_hours'], ascending=False)
+).reset_index()
+summary_table
+
+
+```
+
+### QUESTION 3
+
+What is the best month to fly if you want to avoid delays of any length? Describe the metric you chose and why you chose it to calculate your answer. Include one chart to help support your answer, with the x-axis ordered by month. (To answer this question, you will need to remove any rows that are missing the Month variable.)
+```{python}
+months = {
+    'January': 1,
+    'Febuary': 2,
+    'March': 3,
+    'April': 4,
+    'May': 5,
+    'June': 6,
+    'July': 7,
+    'August': 8,
+    'September': 9,
+    'October': 10,
+    'November': 11,
+    'December': 12,
+}
+
+
+delay_table = (
+    df.groupby('month')
+    .agg(
+        avg_delays_carrier=('num_of_delays_carrier', 'mean'),
+        avg_delays_late_aircraft=('num_of_delays_late_aircraft', 'mean'),
+        avg_delays_nas=('num_of_delays_nas', 'mean')
+    )
+).reset_index()
+
+
+delay_table['month'] = delay_table['month'].replace(months)
+
+
+delay_table = (delay_table.sort_values('month').reset_index(drop=True)).round(2)
+
+delay_table['z_score_carrier'] = (delay_table['avg_delays_carrier'] - delay_table['avg_delays_carrier'].mean()) / delay_table['avg_delays_carrier'].std()
+
+delay_table['z_score_late_aircraft'] = (delay_table['avg_delays_late_aircraft'] - delay_table['avg_delays_late_aircraft'].mean()) / delay_table['avg_delays_late_aircraft'].std()
+
+delay_table['z_score_delays_nas'] = (delay_table['avg_delays_nas'] - delay_table['avg_delays_nas'].mean()) / delay_table['avg_delays_nas'].std()
+
+
+```
+
+To answer these questions, I selected the following three categories of delays: carrier delays in red, delays due to late aircraft in yellow, and NAS delays in blue. These are the most common types of delays at every airport and the ones with the highest values in this dataset. I calculated the z-score for each delay type; in simple terms, z-scores represent how high or low each delay value is compared to its average. According to this chart, the best month to fly is November, as it shows the lowest average values for carrier delays, delays due to late aircraft, and NAS delays. 
+```{python}
+
+(
+    ggplot(delay_table, aes(x='month')) +
+    geom_line(aes(y='z_score_carrier'), color='red') +
+    geom_line(aes(y='z_score_late_aircraft'), color='yellow') +
+    geom_line(aes(y='z_score_delays_nas'), color='blue') + 
+    geom_vline(xintercept=float(11), color='black', linetype='longdash') +
+    geom_text(x=8, y=1.9, label="November: the best month to fly", color='black', size=7) +
+    theme(panel_background=element_rect(fill='lightgrey'), panel_grid=element_blank()) +
+    scale_x_continuous(limits=[0, 13], breaks=[1,2,3,4,5,6,7,8,9,10,11,12])+
+    scale_y_continuous(limits=[-2, 2], breaks=[-1.5,-1,-0.5,0,0.5,1,1.5])+
+    labs(title='Z-Scores by Month', y='Z-Scores') 
+)
+
+
+```
+
+
+
+### QUESTION 4
+According to the BTS website, the “Weather” category only accounts for severe weather delays. Mild weather delays are not counted in the “Weather” category, but are actually included in both the “NAS” and “Late-Arriving Aircraft” categories. Your job is to create a new column that calculates the total number of flights delayed by weather (both severe and mild). You will need to replace all the missing values in the Late Aircraft variable with the mean. Show your work by printing the first 5 rows of data in a table. Use these three rules for your calculations:
+
+100% of delayed flights in the Weather category are due to weather
+30% of all delayed flights in the Late-Arriving category are due to weather
+From April to August, 40% of delayed flights in the NAS category are due to weather. The rest of the months, the proportion rises to 65%
+
+
+```{python}
+df['num_of_delays_late_aircraft'] = df['num_of_delays_late_aircraft'].apply(
+    lambda row: df['num_of_delays_late_aircraft'].mean() if pd.isna(row) else row)
+months = {
+    'January': 1,
+    'Febuary': 2,
+    'March': 3,
+    'April': 4,
+    'May': 5,
+    'June': 6,
+    'July': 7,
+    'August': 8,
+    'September': 9,
+    'October': 10,
+    'November': 11,
+    'December': 12,
+}
+delays=df[['month','num_of_delays_weather','num_of_delays_late_aircraft','num_of_delays_nas','airport_name','airport_code','num_of_flights_total']].dropna()
+delays['month'] = delays['month'].replace(months).astype(int)
+
+delays['delays_by_weather'] = (delays['num_of_delays_weather']).round(2)
+delays['delays_by_w_in_late_aircraft'] = (delays['num_of_delays_late_aircraft'] * 0.3).round(2)
+delays['delays_by_w_in_nas'] = np.where(
+    delays['month'].between(4, 8), 
+    delays['num_of_delays_nas'] * 0.4, 
+    delays['num_of_delays_nas'] * 0.65
+).round(2)
+
+delays['total_delays_by_weather'] = (
+    delays['delays_by_weather'] + 
+    delays['delays_by_w_in_late_aircraft'] + 
+    delays['delays_by_w_in_nas']
+).round(2)
+
+delays['proportion_delays_by_weather'] = (delays['total_delays_by_weather'] / delays['num_of_flights_total']).round(2)
+
+avg_proportion_delays_by_weather = delays.groupby('airport_name')['proportion_delays_by_weather'].mean().round(2)
+
+avg_proportion_delays_by_weather = avg_proportion_delays_by_weather.rename('avg_proportion_delays_by_weather').round(2)
+
+delays['delay_category'] = delays['proportion_delays_by_weather'].apply(
+    lambda x: 'high' if x > 0.15 else 'medium' if x > 0.10 else 'low'
+)
+
+delays = delays.merge(avg_proportion_delays_by_weather, on='airport_name', how='left')
+
+delays[['airport_name','airport_code','month','num_of_flights_total','proportion_delays_by_weather','avg_proportion_delays_by_weather','delay_category']].sort_values('proportion_delays_by_weather',ascending=False).reset_index(drop=True).round(2).head(5)
+
+
+```
+
+
+### QUESTION 5
+Using the new weather variable calculated above, create a barplot showing the proportion of all flights that are delayed by weather at each airport. Describe what you learn from this graph.
+
+
+According to this chart, 1 out of 10 flights is delayed due to weather at San Francisco International Airport, which represents the highest average delay in this data set. In addition, I’ve observed that delays due to weather are not as common as we might think. If we look at another airport with more flights, such as Atlanta Hartsfield-Jackson International Airport, the average of delays due to weather is less than 1%.
+```{python}
+
+( 
+    ggplot(data=delays) +
+        geom_bar(mapping=aes(x='airport_code', y='avg_proportion_delays_by_weather'), stat='identity') +
+        ggsize(800, 400) +
+        ggtitle("Which Airport Has the most delays due to weather?") +
+        xlab("airport") +
+        ylab("proportions delays due to weater ") 
+)
+
+
+```
+
+### Stretch Questions 
+
+Which delay is the worst delay? Create a similar analysis as above for Weahter Delay with: Carrier Delay and Security Delay. Compare the proportion of delay for each of the three categories in a Chart and a Table. Describe your results.
+
+
+```{python}
+
+wd = delay_table[['month', 'z_score_carrier', 'z_score_delays_nas']]
+
+wd['carrier_variation'] = wd['z_score_carrier'].diff().fillna(0)
+wd['nas_variation'] = wd['z_score_delays_nas'].diff().fillna(0)
+
+
+wd['category'] = wd.apply(lambda row: 'high' if (row['z_score_carrier'] > 0.5 or row['z_score_delays_nas'] > 0.5) else ('medium' if (row['z_score_carrier'] > -0.5 or row['z_score_delays_nas'] > -0.5) else 'low'), axis=1)
+wd
+
+
+```
+
+This is a complex question, but we can answer it by looking at the z-scores. Z-scores represent the distance between the overall average and the monthly average for each category, helping us compare "apples to apples." In this case, as the value of each delay approaches zero, the delay worsens. With this in mind and using the table, we can compare both types of delays.
+
+Here, we have both delays represented: the yellow line shows the values for Security delays, and the red line shows the values for Carrier delays. As you can see, both delays have their highs and lows. The yellow line seems to reach lower values, but it’s still difficult to determine which of these is the worst delay.
+
+```{python}
+
+(
+    ggplot(wd, aes(x='month')) +
+    geom_line(aes(y='z_score_delays_nas'), color='yellow') +
+    geom_line(aes(y='z_score_carrier'), color='red') +
+    theme(panel_background=element_rect(fill='lightgrey'), panel_grid=element_blank()) +
+    scale_x_continuous(limits=[0, 13], breaks=[1,2,3,4,5,6,7,8,9,10,11,12]) +
+    scale_y_continuous(limits=[-2, 2], breaks=[-1.5,-1,-0.5,0,0.5,1,1.5]) +
+    labs(title='Z-Scores by Month', y='Z-Scores', color='Legend') 
+)
+
+```
+
+But we can use our variance column, which shows how the values for each delay type vary over the months. With that information in a graph, we can see that carrier delays exhibit more variance over time.
+
+So, we can say that carrier delay is the worst of these delays because its values vary more across the months.
+
+```{python}
+
+(
+    ggplot(wd, aes(x='month')) +
+    geom_line(aes(y='carrier_variation'), color='red') +
+    geom_line(aes(y='nas_variation'), color='yellow') +
+    theme(panel_background=element_rect(fill='lightgrey'), panel_grid=element_blank()) +
+    scale_x_continuous(limits=[0, 13], breaks=[1,2,3,4,5,6,7,8,9,10,11,12]) +
+    scale_y_continuous(limits=[-2, 2], breaks=[-1.5,-1,-0.5,0,0.5,1,1.5]) +
+    labs(title='Variation by Month', y='Variation', color='Legend') 
+)
+
+```

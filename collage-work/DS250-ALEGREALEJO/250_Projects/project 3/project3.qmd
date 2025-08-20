@@ -1,0 +1,253 @@
+---
+title: "Client Report - Project 3"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+```{python}
+import pandas as pd
+import numpy as np
+import sqlite3
+from lets_plot import *
+LetsPlot.setup_html(isolated_frame=True)
+pd.set_option('display.max_columns', 200)
+sqlite_file = 'lahmansbaseballdb.sqlite'
+con = sqlite3.connect(sqlite_file)
+
+```
+### Speech
+
+I want to share some insights from my analysis of baseball player data. I’ve been looking at key factors like career longevity, batting averages, and salary distributions. For example, some players have careers spanning over 20 years, while others have much shorter careers. This analysis highlights the variability in career lengths and how performance and salary are related. Using tools like SQL and data visualization, we can uncover trends and patterns that help us understand player dynamics. These insights can be valuable for our company, helping us make more informed decisions in areas like talent acquisition and performance optimization.
+
+### Question 1
+
+Write an SQL query to create a new dataframe about baseball players who attended BYU-Idaho. The new table should contain five columns: playerID, schoolID, salary, and the yearID/teamID associated with each salary. Order the table by salary (highest to lowest) and print out the table in your report. 
+```{python}
+
+sql = """
+
+SELECT P.playerID, SC.schoolID, SS.salary, SS.yearID,SS.teamID
+FROM 
+PEOPLE AS P
+JOIN COLLEGEPLAYING AS CP ON CP.playerID = P.playerID
+JOIN SCHOOLS AS SC ON SC.schoolID = CP.schoolID
+JOIN SALARIES AS SS ON SS.playerID = P.playerID
+WHERE SC.schoolID = 'idbyuid'
+group by SS.teamID
+order by sum(SS.salary) DESC
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+```
+### Question 2
+
+This three-part question requires you to calculate batting average (number of hits divided by the number of at-bats)
+
+### Question 2 - a
+
+Write an SQL query that provides playerID, yearID, and batting average for players with at least 1 at bat that year. Sort the table from highest batting average to lowest, and then by playerid alphabetically. Show the top 5 results in your report.
+
+```{python}
+
+sql = """
+
+SELECT playerID, yearID, H as total_of_hits, AB as total_of_at_bat,
+    (CAST(H AS FLOAT) / AB) AS batting_average
+FROM BATTING
+WHERE AB >= 1
+ORDER BY batting_average DESC, playerID
+LIMIT 5;
+
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+```
+
+### Question 2 - b
+
+Use the same query as above, but only include players with at least 10 at bats that year. Print the top 5 results.
+```{python}
+
+sql = """
+
+SELECT playerID, yearID, H as total_of_hits, AB as total_of_at_bat,
+    (CAST(H AS FLOAT) / AB) AS batting_average
+FROM BATTING
+WHERE AB >= 10
+ORDER BY batting_average DESC, playerID
+LIMIT 5;
+
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+```
+
+### Question 2 - c
+
+Now calculate the batting average for players over their entire careers (all years combined). Only include players with at least 100 at bats, and print the top 5 results.
+
+```{python}
+
+sql = """
+
+SELECT 
+  playerID, sum(H) as total_of_hits, sum(AB) as total_of_at_bat,
+  CAST(sum(H) AS FLOAT) / sum(AB) AS batting_average
+FROM BATTING
+  group by playerID
+  having total_of_at_bat >= 100
+  ORDER BY 
+    batting_average DESC, playerID
+LIMIT 5;
+
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+```
+
+### Question 3
+
+Pick any two baseball teams and compare them using a metric of your choice (average salary, home runs, number of wins, etc). Write an SQL query to get the data you need, then make a graph using Lets-Plot to visualize the comparison. What do you learn?
+
+```{python}
+
+sql = """
+
+SELECT 
+  name, teamRank as rank, sum(r) as runs_scored, sum(era) as earned_run_average, sum(ra) as opponents_runs_scored, sum(w) as wins, sum(l) as loss,  round((sum(w) / CAST(sum(g) AS FLOAT)) * 100, 2) as match_proportion_wins,sum(g) as total_match
+FROM teams
+  where teamID = 'LAN' OR teamID = 'SFN'
+  group by name
+  order by rank;
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+
+
+```
+
+Now, with these values plotted, we can say that both teams are pretty similar in their performance. We could assume that the Dodgers are a little bit more efficient in their defense and attack attempts. Also, the Giants have received more runs scored from their opponents and have a lower proportion of game wins than the Dodgers. In conclusion, both teams have a great performance, but the Dodgers are more efficient. 
+
+```{python}
+pivot_df = df.melt(id_vars=['name'], value_vars=['runs_scored', 'earned_run_average', 'opponents_runs_scored', 'wins', 'loss','match_proportion_wins', 'total_match'], var_name='metric', value_name='value')
+
+(
+  ggplot(data=pivot_df,mapping=aes(x='metric',y='value',color='name')) +
+  geom_line()  
+)
+```
+### Stretch Question 
+
+1-Advanced Salary Distribution by Position (with Case Statement):
+
+Write an SQL query that provides a summary table showing the average salary for players in each position (e.g., pitcher, catcher, outfielder) across all years. Include the following columns:
+
+position
+average_salary
+total_players
+highest_salary
+
+The highest_salary column should display the highest salary ever earned by a player in that position. If no player in that position has a recorded salary, display “N/A” for the highest salary. 
+
+Additionally, create a new column called salary_category using a case statement:
+
+If the average salary is above $1 million, categorize it as “High Salary.”
+If the average salary is between $500,000 and $1 million, categorize it as “Medium Salary.”
+Otherwise, categorize it as “Low Salary.”
+Order the table by average salary in descending order.
+
+Print the top 10 rows of this summary table.
+
+```{python}
+
+sql = """
+
+SELECT 
+  f.playerID,
+  f.pos as position, 
+  round(avg(s.salary),0) as average_salary, 
+  count(f.playerID) as total_players
+FROM fielding as f
+JOIN salaries as s ON s.playerID = f.playerID
+group by f.playerID;
+
+
+"""
+df = pd.read_sql_query(sql, con)
+df['salary_category'] = df['average_salary'].apply(lambda x: 'High Salary' if x > 1000000 else ('Medium Salary' if x > 500000 else 'Low Salary')
+)
+
+df['average_salary'] = df['average_salary'].apply(lambda x: f'$ {x:,.0f}')
+df=df.sort_values(by='playerID', ascending=True)
+df.head(10)
+
+
+```
+
+2-Advanced Career Longevity and Performance (with Subqueries):
+
+Calculate the average career length (in years) for players who have played at least one game. Then, identify the top 10 players with the longest careers (based on the number of years they played). Include their:
+
+playerID
+first_name
+last_name
+career_length
+The career_length should be calculated as the difference between the maximum and minimum yearID for each player.
+
+```{python}
+
+sql = """
+
+SELECT 
+  playerID,
+  nameFirst,
+  nameLast,
+  career_length,
+  games_played
+FROM (
+
+    SELECT 
+      f.playerID,
+      p.nameFirst,
+      p.nameLast,
+      max(f.yearID) - min(f.yearID) + 1 as career_length,
+      sum(f.g) AS games_played
+    FROM fielding as f
+    JOIN people as p ON p.playerID = f.playerID
+    GROUP BY f.playerID
+    HAVING sum(f.g) > 1
+) as player_careers
+ORDER BY career_length desc
+LIMIT 10;
+
+"""
+df = pd.read_sql_query(sql, con)
+df
+
+
+```

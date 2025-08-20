@@ -1,0 +1,186 @@
+---
+title: "Client Report - Project 4"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+
+
+```{python}
+# Loading in packages
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from lets_plot import *
+LetsPlot.setup_html(isolated_frame=True)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)  
+import seaborn as sns
+dwell = pd.read_csv('dwellings_ml.csv')
+
+```
+
+
+```{python}
+df = dwell.drop('parcel', axis=1)
+before1980 = df.query('yrbuilt <= 1980')[['before1980', 'arcstyle_ONE-STORY', 'gartype_Det','basement', 'sprice']]
+
+#arcstyle_ONE-STORY: Binary indicator for single-story properties.
+#gartype_Det: Detached garage (binary indicator).
+#basement: Total basement area (in square feet or square meters).
+```
+
+### Question 1
+Create 2-3 charts that evaluate potential relationships between the home variables and before1980. Explain what you learn from the charts that could help a machine learning algorithm.
+
+I selected the following variables: before1980, arcstyle_ONE-STORY, gartype_Det, basement, and sprice. These represent houses built before 1980 with one or more rooms, with or without a detached garage, the size of their basement, and the price of the house.
+
+
+```{python}
+corrdf = before1980.corr().sort_values(by='before1980',ascending=False)
+
+
+sns.heatmap(corrdf, annot=True, cmap="coolwarm")
+plt.show()
+```
+
+
+```{python}
+before1980v2=before1980.copy()
+before1980v2 = before1980.copy()
+
+before1980v2['arcstyle_label'] = before1980v2['arcstyle_ONE-STORY'].replace({
+    0: 'One Story',  
+    1: 'More Than One Story'         
+})
+
+before1980v2['gartype_label'] = before1980v2['gartype_Det'].replace({
+    0: 'No Garage',           
+    1: 'Detached Garage'      
+})
+
+(
+
+ggplot(before1980v2) + 
+    geom_point(aes(x='sprice', y='basement', color='before1980')) + 
+    geom_smooth(aes(x='sprice', y='basement'), method='lm', se=False, color='red') + 
+    facet_wrap(['arcstyle_label', 'gartype_label'], ncol=2) + 
+    labs(
+        title="Price and  Basement By Facet",
+        x="Price",
+        y="Basement Size"
+    )
+)
+```
+
+As you can see, these variables present a correlation between them, which could help us better understand how to price houses built before 1980.
+
+### Question 2
+
+Build a classification model labeling houses as being built “before 1980” or “during or after 1980”. Your goal is to reach or exceed 90% accuracy. Explain your final model choice (algorithm, tuning parameters, etc) and describe what other models you tried.
+
+For this question, I chose the RandomForestClassifier algorithm because it provides more robust training and randomness with this amount of data, given that the amount of data is not very large. I also tried the DecisionTreeClassifier algorithm, but I could not achieve more than 87% accuracy.
+
+```{python}
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+
+```
+```{python}
+
+y = df['before1980']  # target
+X = df.drop('before1980', axis=1)  # features
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)  # 70% training y 30% test
+
+# classifier RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100, random_state=15)
+
+# training
+clf = clf.fit(X_train, y_train)
+
+# prediction
+y_pred = clf.predict(X_test)
+
+```
+
+
+
+### Question 3 
+Justify your classification model by discussing the most important features selected by your model. This discussion should include a feature importance chart and a description of the features.
+
+As you can see, the most important feature for my model is the variable named 'yrbuilt,' which represents the year the property was built. This is somewhat obvious, given that we are trying to classify properties as being built before or after a specific date.
+
+```{python}
+
+
+model_data = []
+
+for feature, importance in zip(X.columns, clf.feature_importances_):
+    if importance >= 0.03:
+        model_data.append({'feature': feature, 'importance%': importance})
+
+model = pd.DataFrame(model_data)
+model[['importance%']]=model[['importance%']]*100
+
+model = model.sort_values(by='importance%', ascending=False).reset_index(drop=True)
+
+```
+
+```{python}
+
+(
+  ggplot(data=model,mapping=aes(x='feature', y='importance%',color='importance%'))+
+  geom_point()
+)
+
+```
+
+### Question 4
+
+```{python}
+
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
+
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"Confusion Matrix: {cm}")
+
+
+
+```
+
+The quality of my classification model is demonstrated by the perfect scores across multiple evaluation metrics. Accuracy, precision, and recall all reached 1.0000, indicating that the model correctly classified all instances. Accuracy shows the proportion of correct predictions overall, while precision confirms that all positive predictions were correct, with no false positives. Recall highlights that the model identified all actual positive cases, with no false negatives. The confusion matrix reflects this performance with zero false positives and negatives, reinforcing the model’s strong performance on this dataset. However, these results should be validated on different datasets to ensure generalizability

@@ -1,0 +1,8 @@
+---
+title: "about me"
+subtitle: "my data science portfolio"
+---
+
+
+[DS250-Projects](https://github.com/byui-math-dept/DS250-ALEGREALEJO/tree/main/250_Projects)
+

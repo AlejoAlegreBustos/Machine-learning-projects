@@ -1,0 +1,15 @@
+---
+title: "DS250 Projects"
+subtitle: "Repo for all my Projects"
+# use quarto markdown to 
+---
+
+## Repo for all my Projects
+
+- [Project 0](/250_Projects/proeject 0/project0.qmd)
+- [Project 1](/250_Projects/project 1/project1.qmd)
+- [Project 2](/250_Projects/project 2/project2.qmd)
+- [Project 3](/250_Projects/project 3/project3.qmd)
+- [Project 4](/250_Projects/project 4/project4.qmd)
+- [Project 5](/250_Projects/project 5/project5.qmd)
+- [Project 6](/250_Projects/project 6/project6.qmd)

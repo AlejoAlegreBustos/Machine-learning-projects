@@ -1,0 +1,70 @@
+project: 
+  type: website
+
+website:
+  title: "Alejo Alegre Bustos - Data Science Portfolio"
+  favicon: Images/favicon.png
+  back-to-top-navigation: true
+  repo-url: https://github.com/byui-math-dept/DS250-ALEGREALEJO
+  
+
+  page-footer: 
+    border: true
+    left: "Alejo Alegre Bustos 2024©"
+    right: 
+      - icon: linkedin
+        href: https://www.linkedin.com/in/alejo-alegre-bustos-b03395174/
+
+  navbar:
+    background: primary
+    search: true   
+    right:
+      - text: "Home"
+        file: index.qmd
+      - text: "My Resume"
+        file: resume.qmd
+      - text: "DS250 Projects"
+        file: 250_projects.qmd
+
+  sidebar:
+    - title: "DS 250 Projects"
+      style: "docked"
+      background: light
+      contents:
+        - text: "DS250 Projects"
+          file: 250_projects.qmd
+        - text: "---"
+        - text: "Project 0"
+          file: 250_Projects/proeject 0/project0.qmd
+        - text: "---"
+        - text: "Project 1"
+          file: 250_Projects/project 1/project1.qmd
+        - text: "---"
+        - text: "Project 2"
+          file: 250_Projects/project 2/project2.qmd
+        - text: "---"
+        - text: "Project 3"
+          file: 250_Projects/project 3/project3.qmd
+        - text: "---"
+        - text: "Project 4"
+          file: 250_Projects/project4.qmd
+        - text: "---"
+        - text: "Project 5"
+          file: 250_Projects/project5.qmd
+        - text: "---"
+        - text: "Project 6"
+          file: 250_Projects/project6.qmd
+        - text: "---"
+
+format:  
+  html:
+    theme: #see this link to customize the theme with css (https://quarto.org/docs/output-formats/html-themes.html#dark-mode)
+      light: flatly # more themes can be found [here](https://quarto.org/docs/output-formats/html-themes.html)
+      dark: darkly
+      #light: cosmo
+      #dark: [cosmo, theme-dark.scss]
+    css: styles.css
+    toc: true
+
+
+

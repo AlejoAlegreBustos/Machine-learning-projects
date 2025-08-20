@@ -1,0 +1,14 @@
+---
+layout: cv
+title: Alejo Alegre Bustos's CV
+---
+### Alejo Alegre Bustos
+Future Data Scientist, Futbol Player (5), BYU-Idaho Student.
+
+<div id="webaddress">
+<a href="ale21020@byui.edu">ale21020@byui.edu</a>
+| <a href="https://en.wikipedia.org/wiki/Argentina">My country</a>
+</div>
+
+
+<iframe src="https://drive.google.com/file/d/115zZMkoyURKxMAOdxgTSsSDjPkSKySAc/view?usp=sharing" width="100%" height="100%"></iframe>

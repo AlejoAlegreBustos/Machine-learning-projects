@@ -1,0 +1,243 @@
+---
+title: "Client Report - Project 1"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+from lets_plot import * 
+
+LetsPlot.setup_html()  
+```
+
+
+## Elevator pitch
+
+
+
+Mrs. Comeau, I want to present you with an opportunity to enhance our data analysis using Let's Plot and pandas.
+I've been studying the popularity of names over the last 100 years and how cultural events influence them. For example, the name 'Jack' had a peak in popularity in 1927, long before Titanic.
+These tools will allow us to manipulate data and create interactive visualizations, making it easier to understand social trends. This will not only help us make more informed decisions but can also improve our business strategies.
+.....
+
+```{python}
+df = pd.read_csv("https://raw.githubusercontent.com/byuidatascience/data4names/master/data-raw/names_year/names_year.csv")
+pd.set_option('display.max_rows', 6)
+
+```
+
+
+##  Question 1
+__How does your name at your birth year compare to its use historically?__
+
+My name is not an American name, so it won't appear on this list. However, I chose the name 'Jack' for this activity.
+The use of the name Jack in 1998 (my birth year) seems to be increasing fast, possibly due to the premiere of Titanic in 1997. 
+But if we compare this particular year to the historical use of Jack, I would say that the number of people named Jack is less than 2% when compared to the total over time.
+
+```{python}
+jackinhistory=df.query('name == "Jack"')
+
+```
+
+
+```{python}
+
+(
+    ggplot(data=jackinhistory, mapping=aes(x='year', y='Total',color='Total')) + 
+    geom_line() +  
+    geom_vline(xintercept=float(1998), color='red', linetype='longdash') +
+    geom_text(x=float(1975), y=float(12350), label="Fictitious Jack's birthday", color='red', size=7) +
+    scale_x_continuous(format='d') + 
+    scale_y_continuous(format='d') +
+    labs(
+        title="Historical use of the name Jack", 
+        subtitle="Was the name Jack popular in 1998?",  
+        x="Year",  
+        y="Total",
+        color="Total of Jacks"
+    )
+)
+
+```
+
+##  Question 2
+__If you talked to someone named Brittany on the phone, what is your guess of his or her age? What ages would you not guess?__
+
+Judging by this information, a person named Brittany could be 9 years old at a minimum and 56 years old at a maximum, but my guess would be around 33, which is the average for this name.
+
+```{python}
+Brittany = df.query('name == "Brittany"')
+```
+
+
+```{python}
+
+(
+  ggplot(data=Brittany,mapping=aes(x='year',y='Total',color='Total')) + 
+  geom_line() +
+  scale_x_continuous(format='d') + 
+  scale_y_continuous(format='d')
+      + labs(
+        title="Historical use of the name Brittany", 
+        subtitle="Are Christian Names Disappearing?",  
+        x="Year",  
+        y="Total",  
+        color="Total"
+    )
+
+)
+
+```
+
+##  Question 3
+__Mary, Martha, Peter, and Paul are all Christian names. From 1920 - 2000, compare the name usage of each of the four names in a single chart. What trends do you notice?__
+
+I noticed that the appearance of Christian names has decreased, especially since 1950. Before 1950, those names were very common, with "Mary" being the most popular and "Peter" the least popular. However, after 1950, the popularity of those four names started to decline, and in less than 30 years, their numbers dropped from 50,000 to 11,000. After the year 2000, those numbers continued to fall to less than 2,600.
+
+```{python}
+christian_names=df.query('name == "Martha" or name == "Peter" or name == "Paul" or name == "Mary"')
+christian_names
+```
+
+As shown in the following chart..
+
+
+
+```{python}
+(
+  ggplot(data=christian_names,mapping=aes(x='year',y='Total',color='name')) + 
+  geom_line() +
+  scale_x_continuous(format='d') + 
+  scale_y_continuous(format='d')
+      + labs(
+        title="Decreasing Appearance of Christian Names", 
+        subtitle="Are Christian Names Disappearing?",  
+        x="Year",  
+        y="Total",  
+        color="Name"
+    )
+
+)
+
+```
+
+##  Question 4
+
+__Think of a unique name from a famous movie. Plot the usage of that name and see how changes line up with the movie release. Does it look like the movie had an effect on usage?__
+
+I am using the name Jack, selected from a famous movie. The movie I've chosen is Titanic, a really famous film based on real events. This movie was released in 1997.
+Was the name Jack more popular since Titanic?.
+If we look at the last 50 years, we might conclude that since the premiere of Titanic, the name Jack has become more popular, showing an increase of 60% over 8 years.
+
+```{python}
+jackinhistory=df.query('name == "Jack"')
+
+jackinhistory['et'] = jackinhistory['year'].apply(lambda x: 'Before Titanic' if x < 1997 else 'After Titanic')
+
+jackisince1980=jackinhistory.query('name == "Jack" and year > 1980')
+
+jack_since_titanic=jackinhistory.query('name == "Jack" and year > 1997') 
+
+```
+
+```{python}
+(
+
+    ggplot(data=jackisince1980, mapping=aes(x='year', y='Total')) + 
+    geom_line(mapping=aes(color='et')) +  
+    geom_line(data=jack_since_titanic, mapping=aes(x='year', y='Total', color='et'))  +
+    scale_color_manual(values={'Before Titanic': 'orange', 'After Titanic': 'red'}, labels=['Before Titanic', 'After Titanic']) + 
+    geom_vline(xintercept=float(1997), color='grey', linetype='longdash') +
+    geom_text(x=float(1991), y=float(12150), label='Titanic Premiere', color='red', size=7) +
+    scale_x_continuous(format='d') + 
+    scale_y_continuous(format='d') +
+    labs(
+        title="Evolution of the name Jack since the premiere of Titanic", 
+        subtitle="Was the name Jack more popular since Titanic?",  
+        x="Year",  
+        y="Total",
+        color="Titanic Efect"
+    )
+)
+
+
+```
+
+
+But if we do that, we would not see the whole picture. The name Jack reached its maximum popularity in 1927. In conclusion, the film Titanic had an impact on the use of the name Jack, but it did not significantly affect the name's overall popularity.
+
+
+```{python}
+
+(
+    ggplot(data=jackinhistory, mapping=aes(x='year', y='Total')) + 
+    geom_line(mapping=aes(color='et')) +  
+    geom_line(data=jack_since_titanic, mapping=aes(x='year', y='Total', color='et')) + 
+    scale_color_manual(values={'Before Titanic': 'orange', 'After Titanic': 'red'}, labels=['Before Titanic', 'After Titanic']) + 
+    geom_vline(xintercept=float(1997), color='grey', linetype='longdash') + 
+    geom_text(x=float(1980), y=float(12150), label='Titanic Premiere', color='red', size=7) +
+    scale_x_continuous(format='d') + 
+    scale_y_continuous(format='d') +
+    labs(
+        title="Evolution of the name Jack since the premiere of Titanic", 
+        subtitle="Was the name Jack more popular since Titanic?",  
+        x="Year",  
+        y="Total",
+        color="Titanic Efect"
+    )   
+)
+
+
+```
+
+##  Question 5
+
+__Reproduce the chart Elliot using the data from the names_year.csv file.__
+
+```{python}
+Elliotinhistory=df.query('name == "Elliot" and year > 1949')
+
+(
+  ggplot(data=Elliotinhistory,mapping=aes(x='year',y='Total',color='name')) + 
+  geom_line() + scale_color_manual(values = pd.Series(["blue"], index=['Elliot'])) +
+  geom_vline(xintercept=float(1982),color='red',linetype='longdash') +
+  geom_text(x=float(1974), y=float(1230), label='E.T Released',color='black',size=5) +
+  geom_vline(xintercept=float(1985),color='red',linetype='longdash') +
+  geom_text(x=float(1992), y=float(1230), label='Second Release',color='black',size=5) +
+  geom_vline(xintercept=float(2002),color='red',linetype='longdash') +
+  geom_text(x=float(2008), y=float(1230), label='Third Release',color='black',size=5) +
+  scale_x_continuous(format='d') + 
+  scale_y_continuous(format='d')
+      + labs(
+        title="Elliot...What?",   
+        x="Year",  
+        y="Total",  
+        color="name"
+    )
+
+)
+
+```

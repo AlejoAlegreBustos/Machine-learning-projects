@@ -1,0 +1,401 @@
+---
+title: "Client Report - 5"
+subtitle: "Course DS 250"
+author: "Alejo Alegre Bustos"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+
+```{python}
+import pandas as pd
+import numpy as np
+from lets_plot import *
+LetsPlot.setup_html(isolated_frame=True)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000)  
+import re
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, confusion_matrix
+df = pd.read_csv('StarWars.csv', encoding = "latin")
+
+```
+
+```{python}
+#replace columns names
+newcnames={'RespondentID':'ID',
+'Have you seen any of the 6 films in the Star Wars franchise?':'watched', 'Do you consider yourself to be a fan of the Star Wars film franchise?':'fan','Which of the following Star Wars films have you seen? Please select all that apply.':'film_watched','Please rank the Star Wars films in order of preference with 1 being your favorite film in the franchise and 6 being your least favorite film.':'preference_rank','Please state whether you view the following characters favorably, unfavorably, or are unfamiliar with him/her.':'characters_rank','Which character shot first?':'w_shoot_f', 'Are you familiar with the Expanded Universe?':'Fam_Exp_Univer','Do you consider yourself to be a fan of the Expanded Universe?æ':'EU_fan','Do you consider yourself to be a fan of the Star Trek franchise?':'ST_fan','Location (Census Region)':'Census_Region'
+}
+df = df.rename(columns=newcnames)
+
+
+```
+
+```{python}
+#replace columns values
+
+#Binary column
+#yes - 1
+#no - 0
+yorn={'Yes':2,
+'No':1,
+np.nan:0,'Response':0
+}
+
+df['watched']= df['watched'].replace(yorn)
+df['fan']= df['fan'].replace(yorn)
+df['Fam_Exp_Univer']= df['Fam_Exp_Univer'].replace(yorn)
+df['EU_fan']= df['EU_fan'].replace(yorn)
+df['ST_fan']= df['ST_fan'].replace(yorn)
+
+#categorical columns
+#education
+# Less than high school degree - 1
+# High school degree-2   
+# Some college or Associate degree-3
+# Bachelor degree -4                    
+# Graduate degree  -5                   
+
+education={'Less than high school degree':1,
+'High school degree':2,   
+'Some college or Associate degree':3,
+'Bachelor degree' :4,                    
+'Graduate degree':5,
+'Response':0,
+np.nan:0}
+df['Education']=df['Education'].replace(education)
+
+#location
+location={'East North Central':1,
+'Pacific':2,
+'South Atlantic':3,
+'Middle Atlantic':4,
+'West South Central':5,
+'West North Central':6,
+'Mountain':7,
+'New England':8,
+'East South Central':9,
+'Response':0,
+np.nan:0}
+df['Census_Region']=df['Census_Region'].replace(location)
+
+#gender
+gender={'Female':1,
+'Male':2,
+'Response':0,
+np.nan:0}
+
+df['Gender']=df['Gender'].replace(gender)
+
+#w_shoot_f
+w_shoot_f={
+"Han":1,
+"I don't understand this question":0,
+'Greedo':2,
+'Response':0,
+np.nan:0 }
+df['w_shoot_f']=df['w_shoot_f'].replace(w_shoot_f)
+#Age
+age={'18-29':1,'30-44':2,'45-60':3,
+'> 60':4,
+'Response':0,
+np.nan:0}
+df['Age']=df['Age'].replace(age)
+
+#Household Income
+h_i={
+'$0 - $24,999':1,
+'$25,000 - $49,999':2,
+'$50,000 - $99,999':3,
+'$100,000 - $149,999':4,
+'$150,000+':5,
+'Response':0,
+np.nan:0  
+}
+df['Household Income']=df['Household Income'].replace(h_i)
+
+
+```
+```{python}
+
+columns_for_headers=df[['ID','preference_rank'	,'Unnamed: 10'	,'Unnamed: 11'	,'Unnamed: 12',	'Unnamed: 13'	,'Unnamed: 14','characters_rank',	'Unnamed: 16',	'Unnamed: 17',	'Unnamed: 18',	'Unnamed: 19',	'Unnamed: 20',	'Unnamed: 21',	'Unnamed: 22',	'Unnamed: 23',	'Unnamed: 24',	'Unnamed: 25','Unnamed: 26',	'Unnamed: 27',	'Unnamed: 28']].copy()
+df2 = ['preference_rank'	,'Unnamed: 10'	,'Unnamed: 11'	,'Unnamed: 12',	'Unnamed: 13'	,'Unnamed: 14','characters_rank',	'Unnamed: 16',	'Unnamed: 17',	'Unnamed: 18',	'Unnamed: 19',	'Unnamed: 20',	'Unnamed: 21',	'Unnamed: 22',	'Unnamed: 23',	'Unnamed: 24',	'Unnamed: 25','Unnamed: 26',	'Unnamed: 27',	'Unnamed: 28']
+
+df = df.drop(df2, axis=1)
+
+```
+```{python}
+#up headers
+
+columns_for_headers['ID'] = columns_for_headers['ID'].replace(np.nan, 'ID')
+
+headers = columns_for_headers.iloc[0].tolist()
+
+def replace_roman_num(text):
+    r_to_n = {
+        'I': '1', 'II': '2', 'III': '3', 'IV': '4', 'V': '5', 'VI': '6'
+    }
+    return re.sub(r'\b(I{1,3}|IV|V?I{0,3})\b', lambda m: r_to_n.get(m.group(0), m.group(0)), text)
+
+headers = ['rank_' + '_'.join([word[0].upper() for word in replace_roman_num(str(col)).split()]) if i != 0 else col for i, col in enumerate(headers)]
+
+
+columns_for_headers.columns = headers
+
+
+columns_for_headers = columns_for_headers[1:].reset_index(drop=True)
+
+```
+
+
+```{python}
+replace_values={'Very favorably':6,                               
+'Somewhat favorably':5,
+'Neither favorably nor unfavorably (neutral)':4,
+'Unfamiliar (N/A)':3,
+'Somewhat unfavorably':2,
+'Very unfavorably':1,
+'NaN':0,
+np.nan:0,
+'1':1,
+'2':2,
+'3':3,
+'4':4,
+'5':5,
+'6':6}
+columns_for_headers.replace(replace_values,inplace=True)
+```
+
+```{python}
+
+w_cnames={'film_watched':'wc_S_W_1',	'Unnamed: 4':'wc_S_W_2',	'Unnamed: 5':'wc_S_W_3',	'Unnamed: 6':'wc_S_W_4',	'Unnamed: 7':'wc_S_W_5',	'Unnamed: 8':'wc_S_W_6'}
+df = df.rename(columns=w_cnames)
+
+```
+```{python}
+
+pattern = r"Star\sWars:\sEpisode\s[IVXLCDM]+\s[\w\s]+"
+df['wc_S_W_1']=df['wc_S_W_1'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df['wc_S_W_2']=df['wc_S_W_2'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df['wc_S_W_3']=df['wc_S_W_3'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df['wc_S_W_4']=df['wc_S_W_4'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df['wc_S_W_5']=df['wc_S_W_5'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df['wc_S_W_6']=df['wc_S_W_6'].apply(lambda x: 1 if re.match(pattern, str(x)) else 0)
+df = df.drop(0, axis=0).reset_index(drop=True)
+
+```
+
+```{python}
+df_merged = pd.merge(df, columns_for_headers, on='ID')
+```
+### Question 1
+
+Shorten the column names and clean them up for easier use with pandas. Provide a table or list that exemplifies how you fixed the names.
+
+To clean and fix the column names, I used some dictionaries and acronyms to shorten them. I did this because it helps handle each column better, and pandas often has issues with spaces and special characters, so this helps avoid those problems.
+```{python}
+df_merged.head(15)
+```
+
+
+### Question 2
+
+Clean and format the data so that it can be used in a machine learning model. As you format the data, you should complete each item listed below. In your final report provide example(s) of the reformatted data with a short description of the changes made.
+
+
+- Filter the dataset to respondents that have seen at least one film
+- Create a new column that converts the age ranges to a single number. Drop - the age range categorical column
+- Create a new column that converts the education groupings to a single number. Drop the school categorical column
+- Create a new column that converts the income ranges to a single number. Drop the income range categorical column
+- Create your target (also known as “y” or “label”) column based on the new income range column
+- One-hot encode all remaining categorical columns
+
+
+I split my dataset into two: one needed the first row as headers for its columns, and the other just required a replacement of its column names. 
+After that, I spent time grouping data, like age and household income, and replacing those groups with numerical representations. For example, the number one represents group one for age, and so on for the rest.
+Then, I changed the data type of the columns, since the data will be used for a machine learning model and needs to be numerical.
+Finally, I merged those datasets into a single clean dataset by matching the ID column.
+
+```{python}
+df_merged.head(10)
+```
+
+
+
+### Question 3
+
+Validate that the data provided on GitHub lines up with the article by recreating 2 of the visuals from the article.
+
+```{python}
+all_movies = df_merged.query('`wc_S_W_1` == 1 and `wc_S_W_2` == 1 and `wc_S_W_3` == 1 and `wc_S_W_4` == 1 and `wc_S_W_5` == 1 and `wc_S_W_6` == 1').reset_index(drop=True)
+
+
+all_movies = all_movies[['ID','wc_S_W_1', 'wc_S_W_2', 'wc_S_W_3', 'wc_S_W_4', 'wc_S_W_5', 'wc_S_W_6','rank_S_W_E_1_T_P_M', 'rank_S_W_E_2_A_O_T_C', 'rank_S_W_E_3_R_O_T_S', 'rank_S_W_E_4_A_N_H', 'rank_S_W_E_5_T_E_S_B', 'rank_S_W_E_6_R_O_T_J']]
+
+
+
+```
+```{python}
+
+df_melted = all_movies.melt(id_vars=['ID'], 
+                            value_vars=[
+                                'rank_S_W_E_1_T_P_M', 'rank_S_W_E_2_A_O_T_C', 'rank_S_W_E_3_R_O_T_S', 
+                                'rank_S_W_E_4_A_N_H', 'rank_S_W_E_5_T_E_S_B', 'rank_S_W_E_6_R_O_T_J'
+                            ],  
+                            var_name='movie', 
+                            value_name='rank_position')
+
+df_first_rank = df_melted[df_melted['rank_position'] == 1]
+
+movie_counts = df_first_rank.groupby('movie').size().reset_index(name='total_votes')
+
+total_voters = all_movies['ID'].nunique()
+
+movie_counts['total_voters'] = total_voters
+movie_counts['percentage_of_total'] = round((movie_counts['total_votes'] / total_voters) * 100,0)
+
+movies_names={
+  'rank_S_W_E_1_T_P_M':'Episode I: The Phantom Menace.', 'rank_S_W_E_2_A_O_T_C':"Episode II: Attack of the Clones.", 'rank_S_W_E_3_R_O_T_S':'Episode III: Revenge of the Sith.', 
+  'rank_S_W_E_4_A_N_H':"Episode IV: A New Hope.", 'rank_S_W_E_5_T_E_S_B':"Episode V: The Empire Strikes Back.", 'rank_S_W_E_6_R_O_T_J':'Episode VI: Return of the Jedi.'}
+movie_counts=movie_counts.replace(movies_names).sort_values(by='movie',ascending=False)
+```
+
+
+
+```{python}
+(
+  
+  ggplot(data=movie_counts, mapping=aes(x='percentage_of_total', y='movie')) + 
+    geom_bar(stat='identity',  show_legend=False) +
+     geom_text(aes(label='percentage_of_total'), 
+              nudge_x=-1.5,
+              ha='left', 
+              format_string='{:.} %') +  
+    theme(panel_background=element_rect(fill='lightgrey'), 
+          panel_grid=element_blank(),
+          axis_text_y=element_text(size=10),
+          plot_title=element_text(size=14, hjust=0),  
+          plot_subtitle=element_text(size=10, hjust=0),  
+          plot_margin=(10, 10, 10, 0)) +
+     ggsize(1000, 600) +
+    labs(title="What's the best Star Wars moive?",subtitle=f'Of {total_voters} respondents who have seen all six films',x='',y='')
+
+)
+    
+```
+
+```{python}
+all_movies2=df_merged.query('`wc_S_W_1` == 1 or `wc_S_W_2` == 1 or `wc_S_W_3` == 1 or `wc_S_W_4` == 1 or `wc_S_W_5` == 1 or `wc_S_W_6` == 1').reset_index(drop=True)
+
+all_movies2=all_movies2[['ID','wc_S_W_1', 'wc_S_W_2', 'wc_S_W_3', 'wc_S_W_4', 'wc_S_W_5', 'wc_S_W_6']]
+
+df_melted2 = all_movies2.melt(id_vars=['ID'], 
+                             value_vars=['wc_S_W_1', 'wc_S_W_2', 'wc_S_W_3', 'wc_S_W_4', 'wc_S_W_5', 'wc_S_W_6'],  
+                             var_name='movie', 
+                             value_name='h_seen')
+
+
+movie_counts2 = df_melted2.groupby('movie')['h_seen'].sum().reset_index(name='total_seens')
+
+total_views = all_movies2['ID'].count()
+
+movie_counts2['percentage_of_total'] = round((movie_counts2['total_seens'] / total_views) * 100, 0)
+
+
+movies_names2 = {
+    'wc_S_W_1': 'Episode I: The Phantom Menace.', 
+    'wc_S_W_2': "Episode II: Attack of the Clones.", 
+    'wc_S_W_3': 'Episode III: Revenge of the Sith.',
+    'wc_S_W_4': "Episode IV: A New Hope.", 
+    'wc_S_W_5': "Episode V: The Empire Strikes Back.", 
+    'wc_S_W_6': 'Episode VI: Return of the Jedi.'
+}
+
+movie_counts2['movie'] = movie_counts2['movie'].replace(movies_names2)
+
+movie_counts2 = movie_counts2.sort_values(by='total_seens', ascending=False)
+
+
+
+```
+
+```{python}
+(
+  
+  ggplot(data=movie_counts2, mapping=aes(x='percentage_of_total', y='movie')) + 
+    geom_bar(stat='identity',  show_legend=False) +
+     geom_text(aes(label='percentage_of_total'), 
+              nudge_x=-2.5,
+              ha='left', 
+              format_string='{:.} %') +  
+    theme(panel_background=element_rect(fill='lightgrey'), 
+          panel_grid=element_blank(),
+          axis_text_y=element_text(size=10),
+          plot_title=element_text(size=14, hjust=0),  
+          plot_subtitle=element_text(size=10, hjust=0),  
+          plot_margin=(10, 10, 10, 0)) +
+     ggsize(1000, 600) +
+    labs(title="Which 'Star Wars' moives Have you Seen?",subtitle=f'Of {total_views} respondents who have seen any film',x='',y='')
+
+)
+```
+
+
+### Question 4
+
+Build a machine learning model that predicts whether a person makes more than $50k. Describe your model and report the accuracy.
+
+
+```{python}
+
+y = df_merged['Household Income']  # target
+X = df_merged.drop('Household Income', axis=1)  # features
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1)  # 70% training y 30% test
+
+# classifier RandomForestClassifier
+clf = RandomForestClassifier(n_estimators=100, random_state=150)
+
+# training
+clf = clf.fit(X_train, y_train)
+
+# prediction
+y_pred = clf.predict(X_test)
+
+```
+
+According to the results of our RandomForestClassifier model, the performance is not good. It seems we could not achieve more than 41% accuracy, at least with this amount of data, to determine the household income of a person.
+
+```{python}
+
+accuracy = accuracy_score(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred)
+
+print(f"Accuracy: {(accuracy * 100):.2f}")
+print(f"Confusion Matrix: {cm}")
+
+
+```
