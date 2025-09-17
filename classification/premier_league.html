@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>premier_league</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="premier_league_files/libs/clipboard/clipboard.min.js"></script>
+<script src="premier_league_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="premier_league_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="premier_league_files/libs/quarto-html/popper.min.js"></script>
+<script src="premier_league_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="premier_league_files/libs/quarto-html/anchor.min.js"></script>
+<link href="premier_league_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="premier_league_files/libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="premier_league_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="premier_league_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="premier_league_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<p>‘Opponent’, ‘Is_Home’, ‘Result’, ‘Goals’, ‘Opponent_Goals’, ‘Possession’, ‘Shots’, ‘Shots_On_Target’, ‘Passes_Completed’, ‘Pass_Accuracy’, ‘Corners’, ‘Crosses’, ‘Fouls’, ‘Offsides’, ‘Opponent_Possession’, ‘Opponent_Shots’, ‘Opponent_Shots_On_Target’, ‘Opponent_Passes_Completed’, ‘Opponent_Pass_Accuracy’, ‘Opponent_Corners’, ‘Opponent_Crosses’, ‘Opponent_Fouls’, ‘Opponent_Offsides’, ‘Shot_Efficiency’, ‘Season’, ‘Month’, ‘Day_of_Week’, ‘Last5_Avg_Goals’, ‘Last5_Win_Rate’, ‘club_name’, ‘Date_day’, ‘Date_month’, ‘Date_year’, ‘Date_weekday’, ‘Date_quarter’, ‘Date_hour’, ‘Date_minute’, ‘Date_second’</p>
+<div id="ed597512" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> zipfile</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> io</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> plotnine <span class="im">import</span> <span class="op">*</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> plotly.express <span class="im">as</span> px</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># URL del dataset en Kaggle (funcionando con requests en tu caso)</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://www.kaggle.com/api/v1/datasets/download/ensarakbas/premier-league-top-6-teams-match-statistics"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Descargar el zip</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url, allow_redirects<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> response.status_code <span class="op">==</span> <span class="dv">200</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"download completed "</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Abrir el zip desde memoria</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> zipfile.ZipFile(io.BytesIO(response.content)) <span class="im">as</span> zip_file:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"files in zip:"</span>, zip_file.namelist())</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Filtrar solo archivos CSV</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        csv_files <span class="op">=</span> [name <span class="cf">for</span> name <span class="kw">in</span> zip_file.namelist() <span class="cf">if</span> name.endswith(<span class="st">".csv"</span>)]</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Leer todos los CSVs en una lista de DataFrames</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        dfs <span class="op">=</span> []</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> name <span class="kw">in</span> csv_files:</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"reading csv </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>            df_temp <span class="op">=</span> pd.read_csv(zip_file.<span class="bu">open</span>(name))</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>            df_temp[<span class="st">"origen_csv"</span>] <span class="op">=</span> name  <span class="co"># opcional: para saber de qué archivo vino</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>            dfs.append(df_temp)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Concatenar todo en un único DataFrame</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        df_final <span class="op">=</span> pd.concat(dfs, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        aliquota <span class="op">=</span> df_final.sample(n<span class="op">=</span><span class="dv">50</span>, random_state<span class="op">=</span><span class="dv">32</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Guardar la alícuota en un CSV separado</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        aliquota.to_csv(<span class="st">"aliquota_test.csv"</span>, index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Eliminar las filas seleccionadas del dataset original para entrenamiento</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        df_final <span class="op">=</span> df_final.drop(aliquota.index).reset_index(drop<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"df merged ready"</span>)</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"final shape:"</span>, df_final.shape)</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        df_final.head(<span class="dv">5</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"download failed:"</span>, response.status_code)</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>download completed 
+files in zip: ['Arsenal.csv', 'Chelsea.csv', 'Liverpool.csv', 'Manchester City.csv', 'Manchester United.csv', 'Tottenham.csv']
+reading csv Arsenal.csv...
+reading csv Chelsea.csv...
+reading csv Liverpool.csv...
+reading csv Manchester City.csv...
+reading csv Manchester United.csv...
+reading csv Tottenham.csv...
+df merged ready
+final shape: (4144, 31)</code></pre>
+</div>
+</div>
+<div id="2fae2e9c" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'club_name'</span>] <span class="op">=</span> df_final[<span class="st">'origen_csv'</span>].<span class="bu">str</span>.replace(<span class="st">'.csv'</span>, <span class="st">''</span>, regex<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> df_final.drop(columns<span class="op">=</span>[<span class="st">'origen_csv'</span>])</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="b96d726a" class="cell" data-execution_count="41">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_final.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="41">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Date</th>
+<th data-quarto-table-cell-role="th">Opponent</th>
+<th data-quarto-table-cell-role="th">Is_Home</th>
+<th data-quarto-table-cell-role="th">Result</th>
+<th data-quarto-table-cell-role="th">Goals</th>
+<th data-quarto-table-cell-role="th">Opponent_Goals</th>
+<th data-quarto-table-cell-role="th">Possession</th>
+<th data-quarto-table-cell-role="th">Shots</th>
+<th data-quarto-table-cell-role="th">Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Corners</th>
+<th data-quarto-table-cell-role="th">Crosses</th>
+<th data-quarto-table-cell-role="th">Fouls</th>
+<th data-quarto-table-cell-role="th">Offsides</th>
+<th data-quarto-table-cell-role="th">Opponent_Possession</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Opponent_Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Opponent_Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Opponent_Corners</th>
+<th data-quarto-table-cell-role="th">Opponent_Crosses</th>
+<th data-quarto-table-cell-role="th">Opponent_Fouls</th>
+<th data-quarto-table-cell-role="th">Opponent_Offsides</th>
+<th data-quarto-table-cell-role="th">Shot_Efficiency</th>
+<th data-quarto-table-cell-role="th">Season</th>
+<th data-quarto-table-cell-role="th">Month</th>
+<th data-quarto-table-cell-role="th">Day_of_Week</th>
+<th data-quarto-table-cell-role="th">Last5_Avg_Goals</th>
+<th data-quarto-table-cell-role="th">Last5_Win_Rate</th>
+<th data-quarto-table-cell-role="th">club_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2013-08-04 18:20:00</td>
+<td>Galatasaray</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>2</td>
+<td>55</td>
+<td>12</td>
+<td>5</td>
+<td>425</td>
+<td>80</td>
+<td>4</td>
+<td>2</td>
+<td>12</td>
+<td>2</td>
+<td>45</td>
+<td>12</td>
+<td>6</td>
+<td>399</td>
+<td>81</td>
+<td>5</td>
+<td>3</td>
+<td>15</td>
+<td>2</td>
+<td>0.416667</td>
+<td>2013</td>
+<td>8</td>
+<td>7</td>
+<td>1.000000</td>
+<td>0.00</td>
+<td>Arsenal</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2013-08-17 17:00:00</td>
+<td>Aston Villa</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>3</td>
+<td>64</td>
+<td>15</td>
+<td>4</td>
+<td>457</td>
+<td>87</td>
+<td>4</td>
+<td>4</td>
+<td>15</td>
+<td>3</td>
+<td>36</td>
+<td>10</td>
+<td>5</td>
+<td>216</td>
+<td>71</td>
+<td>3</td>
+<td>2</td>
+<td>19</td>
+<td>1</td>
+<td>0.266667</td>
+<td>2013</td>
+<td>8</td>
+<td>6</td>
+<td>1.000000</td>
+<td>0.00</td>
+<td>Arsenal</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2013-08-21 21:45:00</td>
+<td>Fenerbahçe</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>60</td>
+<td>13</td>
+<td>7</td>
+<td>451</td>
+<td>84</td>
+<td>6</td>
+<td>2</td>
+<td>14</td>
+<td>0</td>
+<td>40</td>
+<td>6</td>
+<td>2</td>
+<td>350</td>
+<td>79</td>
+<td>5</td>
+<td>2</td>
+<td>15</td>
+<td>1</td>
+<td>0.538462</td>
+<td>2013</td>
+<td>8</td>
+<td>3</td>
+<td>1.666667</td>
+<td>0.33</td>
+<td>Arsenal</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2013-08-24 14:45:00</td>
+<td>Fulham</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>54</td>
+<td>19</td>
+<td>9</td>
+<td>496</td>
+<td>87</td>
+<td>8</td>
+<td>9</td>
+<td>9</td>
+<td>0</td>
+<td>46</td>
+<td>16</td>
+<td>7</td>
+<td>421</td>
+<td>87</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>3</td>
+<td>0.473684</td>
+<td>2013</td>
+<td>8</td>
+<td>6</td>
+<td>2.000000</td>
+<td>0.50</td>
+<td>Arsenal</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2013-08-27 21:45:00</td>
+<td>Fenerbahçe</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td>65</td>
+<td>14</td>
+<td>6</td>
+<td>460</td>
+<td>86</td>
+<td>2</td>
+<td>4</td>
+<td>16</td>
+<td>2</td>
+<td>35</td>
+<td>6</td>
+<td>4</td>
+<td>350</td>
+<td>79</td>
+<td>3</td>
+<td>4</td>
+<td>16</td>
+<td>1</td>
+<td>0.428571</td>
+<td>2013</td>
+<td>8</td>
+<td>2</td>
+<td>2.000000</td>
+<td>0.60</td>
+<td>Arsenal</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="606def1a" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_final.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 4144 entries, 0 to 4143
+Data columns (total 31 columns):
+ #   Column                     Non-Null Count  Dtype  
+---  ------                     --------------  -----  
+ 0   Date                       4144 non-null   object 
+ 1   Opponent                   4144 non-null   object 
+ 2   Is_Home                    4144 non-null   int64  
+ 3   Result                     4144 non-null   int64  
+ 4   Goals                      4144 non-null   int64  
+ 5   Opponent_Goals             4144 non-null   int64  
+ 6   Possession                 4144 non-null   int64  
+ 7   Shots                      4144 non-null   int64  
+ 8   Shots_On_Target            4144 non-null   int64  
+ 9   Passes_Completed           4144 non-null   int64  
+ 10  Pass_Accuracy              4144 non-null   int64  
+ 11  Corners                    4144 non-null   int64  
+ 12  Crosses                    4144 non-null   int64  
+ 13  Fouls                      4144 non-null   int64  
+ 14  Offsides                   4144 non-null   int64  
+ 15  Opponent_Possession        4144 non-null   int64  
+ 16  Opponent_Shots             4144 non-null   int64  
+ 17  Opponent_Shots_On_Target   4144 non-null   int64  
+ 18  Opponent_Passes_Completed  4144 non-null   int64  
+ 19  Opponent_Pass_Accuracy     4144 non-null   int64  
+ 20  Opponent_Corners           4144 non-null   int64  
+ 21  Opponent_Crosses           4144 non-null   int64  
+ 22  Opponent_Fouls             4144 non-null   int64  
+ 23  Opponent_Offsides          4144 non-null   int64  
+ 24  Shot_Efficiency            4143 non-null   float64
+ 25  Season                     4144 non-null   int64  
+ 26  Month                      4144 non-null   int64  
+ 27  Day_of_Week                4144 non-null   int64  
+ 28  Last5_Avg_Goals            4144 non-null   float64
+ 29  Last5_Win_Rate             4144 non-null   float64
+ 30  club_name                  4144 non-null   object 
+dtypes: float64(3), int64(25), object(3)
+memory usage: 1003.8+ KB</code></pre>
+</div>
+</div>
+<div id="39d413c8" class="cell" data-execution_count="28">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>df_final.describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="28">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Is_Home</th>
+<th data-quarto-table-cell-role="th">Result</th>
+<th data-quarto-table-cell-role="th">Goals</th>
+<th data-quarto-table-cell-role="th">Opponent_Goals</th>
+<th data-quarto-table-cell-role="th">Possession</th>
+<th data-quarto-table-cell-role="th">Shots</th>
+<th data-quarto-table-cell-role="th">Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Corners</th>
+<th data-quarto-table-cell-role="th">Crosses</th>
+<th data-quarto-table-cell-role="th">Fouls</th>
+<th data-quarto-table-cell-role="th">Offsides</th>
+<th data-quarto-table-cell-role="th">Opponent_Possession</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Opponent_Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Opponent_Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Opponent_Corners</th>
+<th data-quarto-table-cell-role="th">Opponent_Crosses</th>
+<th data-quarto-table-cell-role="th">Opponent_Fouls</th>
+<th data-quarto-table-cell-role="th">Opponent_Offsides</th>
+<th data-quarto-table-cell-role="th">Shot_Efficiency</th>
+<th data-quarto-table-cell-role="th">Season</th>
+<th data-quarto-table-cell-role="th">Month</th>
+<th data-quarto-table-cell-role="th">Day_of_Week</th>
+<th data-quarto-table-cell-role="th">Last5_Avg_Goals</th>
+<th data-quarto-table-cell-role="th">Last5_Win_Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">count</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4143.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+<td>4144.000000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">mean</td>
+<td>0.504344</td>
+<td>0.349180</td>
+<td>1.958253</td>
+<td>1.075048</td>
+<td>58.019788</td>
+<td>15.143581</td>
+<td>5.610763</td>
+<td>477.937259</td>
+<td>84.330116</td>
+<td>5.976351</td>
+<td>4.195946</td>
+<td>10.751689</td>
+<td>1.987693</td>
+<td>41.958977</td>
+<td>10.364624</td>
+<td>3.624276</td>
+<td>318.765444</td>
+<td>77.222973</td>
+<td>4.130309</td>
+<td>3.383929</td>
+<td>10.800193</td>
+<td>2.073600</td>
+<td>0.378714</td>
+<td>2019.015685</td>
+<td>6.627172</td>
+<td>4.926400</td>
+<td>1.957650</td>
+<td>0.577667</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">std</td>
+<td>0.500041</td>
+<td>0.825279</td>
+<td>1.486262</td>
+<td>1.102918</td>
+<td>10.907931</td>
+<td>6.049829</td>
+<td>2.835806</td>
+<td>124.248427</td>
+<td>5.029155</td>
+<td>3.165393</td>
+<td>2.671891</td>
+<td>3.763318</td>
+<td>1.650370</td>
+<td>10.889002</td>
+<td>4.895432</td>
+<td>2.261880</td>
+<td>116.718049</td>
+<td>8.038196</td>
+<td>2.626736</td>
+<td>2.367827</td>
+<td>3.731922</td>
+<td>1.670444</td>
+<td>0.147749</td>
+<td>3.373806</td>
+<td>3.818947</td>
+<td>1.937507</td>
+<td>0.733888</td>
+<td>0.231944</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">min</td>
+<td>0.000000</td>
+<td>-1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>94.000000</td>
+<td>49.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>71.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>2011.000000</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">25%</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.000000</td>
+<td>0.000000</td>
+<td>51.000000</td>
+<td>11.000000</td>
+<td>4.000000</td>
+<td>393.000000</td>
+<td>81.000000</td>
+<td>4.000000</td>
+<td>2.000000</td>
+<td>8.000000</td>
+<td>1.000000</td>
+<td>34.000000</td>
+<td>7.000000</td>
+<td>2.000000</td>
+<td>230.000000</td>
+<td>72.000000</td>
+<td>2.000000</td>
+<td>2.000000</td>
+<td>8.000000</td>
+<td>1.000000</td>
+<td>0.277778</td>
+<td>2016.000000</td>
+<td>3.000000</td>
+<td>3.000000</td>
+<td>1.400000</td>
+<td>0.400000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">50%</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>2.000000</td>
+<td>1.000000</td>
+<td>59.000000</td>
+<td>15.000000</td>
+<td>5.000000</td>
+<td>473.000000</td>
+<td>85.000000</td>
+<td>6.000000</td>
+<td>4.000000</td>
+<td>11.000000</td>
+<td>2.000000</td>
+<td>41.000000</td>
+<td>10.000000</td>
+<td>3.000000</td>
+<td>304.000000</td>
+<td>78.000000</td>
+<td>4.000000</td>
+<td>3.000000</td>
+<td>11.000000</td>
+<td>2.000000</td>
+<td>0.368421</td>
+<td>2019.000000</td>
+<td>7.000000</td>
+<td>6.000000</td>
+<td>2.000000</td>
+<td>0.600000</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">75%</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>3.000000</td>
+<td>2.000000</td>
+<td>66.000000</td>
+<td>19.000000</td>
+<td>7.000000</td>
+<td>559.000000</td>
+<td>88.000000</td>
+<td>8.000000</td>
+<td>6.000000</td>
+<td>13.000000</td>
+<td>3.000000</td>
+<td>49.000000</td>
+<td>13.000000</td>
+<td>5.000000</td>
+<td>392.000000</td>
+<td>83.000000</td>
+<td>6.000000</td>
+<td>5.000000</td>
+<td>13.000000</td>
+<td>3.000000</td>
+<td>0.466667</td>
+<td>2022.000000</td>
+<td>10.000000</td>
+<td>7.000000</td>
+<td>2.400000</td>
+<td>0.800000</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">max</td>
+<td>1.000000</td>
+<td>1.000000</td>
+<td>9.000000</td>
+<td>7.000000</td>
+<td>84.000000</td>
+<td>58.000000</td>
+<td>20.000000</td>
+<td>979.000000</td>
+<td>96.000000</td>
+<td>20.000000</td>
+<td>24.000000</td>
+<td>25.000000</td>
+<td>12.000000</td>
+<td>80.000000</td>
+<td>36.000000</td>
+<td>16.000000</td>
+<td>902.000000</td>
+<td>95.000000</td>
+<td>17.000000</td>
+<td>16.000000</td>
+<td>27.000000</td>
+<td>11.000000</td>
+<td>1.000000</td>
+<td>2025.000000</td>
+<td>12.000000</td>
+<td>7.000000</td>
+<td>6.000000</td>
+<td>1.000000</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="66aae14e" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dfnull <span class="op">=</span> df_final.isnull().<span class="bu">sum</span>().reset_index()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dfnull.columns <span class="op">=</span> [<span class="st">'column'</span>, <span class="st">'nulls'</span>]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dfnull<span class="op">=</span>dfnull.query(<span class="st">" nulls &gt; 0"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dfnull[<span class="st">'mean'</span>]<span class="op">=</span>dfnull[<span class="st">'nulls'</span>].mean()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="8f7c3121" class="cell" data-execution_count="34">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">6</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sns.heatmap(dfnull[[<span class="st">'nulls'</span>]].set_index(dfnull[<span class="st">'column'</span>]), annot<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">"Reds"</span>,fmt<span class="op">=</span><span class="st">"d"</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="premier_league_files/figure-html/cell-8-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="d89e286d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'Shot_Efficiency'</span>]<span class="op">=</span>df_final[<span class="st">'Shot_Efficiency'</span>].fillna(df_final[<span class="st">'Shot_Efficiency'</span>].mean())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="da15a30c" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'Shot_Efficiency'</span>].isnull().<span class="bu">sum</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>np.int64(0)</code></pre>
+</div>
+</div>
+<div id="45272a24" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preprocess_dates(df):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">     transforma columnas de fechas en columnas numéricas.</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co">        df (pd.DataFrame): DataFrame original</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">    </span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="co">        pd.DataFrame: DataFrame con columnas de fecha convertidas a componentes numéricos</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Columnas de fechas a transformar</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    dates_encode <span class="op">=</span> [<span class="st">'Date'</span>]</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> dates_encode:</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> col <span class="kw">in</span> df.columns:</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Convertir a datetime (auto detecta formato tipo 2013-08-04 18:20:00)</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>            df[col] <span class="op">=</span> pd.to_datetime(df[col], errors<span class="op">=</span><span class="st">'coerce'</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Extraer componentes de fecha</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_day'</span>]      <span class="op">=</span> df[col].dt.day.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_month'</span>]    <span class="op">=</span> df[col].dt.month.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_year'</span>]     <span class="op">=</span> df[col].dt.year.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_weekday'</span>]  <span class="op">=</span> df[col].dt.weekday.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_quarter'</span>]  <span class="op">=</span> df[col].dt.quarter.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Extraer componentes de tiempo (por si querés usarlos también)</span></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_hour'</span>]     <span class="op">=</span> df[col].dt.hour.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_minute'</span>]   <span class="op">=</span> df[col].dt.minute.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>            df[col <span class="op">+</span> <span class="st">'_second'</span>]   <span class="op">=</span> df[col].dt.second.fillna(<span class="dv">0</span>).astype(<span class="st">'int32'</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Eliminar las columnas de fecha originales</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>    df.drop(columns<span class="op">=</span>[c <span class="cf">for</span> c <span class="kw">in</span> dates_encode <span class="cf">if</span> c <span class="kw">in</span> df.columns], inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="2a135b08" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>df_final<span class="op">=</span>preprocess_dates(df_final)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>df_final.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Opponent</th>
+<th data-quarto-table-cell-role="th">Is_Home</th>
+<th data-quarto-table-cell-role="th">Result</th>
+<th data-quarto-table-cell-role="th">Goals</th>
+<th data-quarto-table-cell-role="th">Opponent_Goals</th>
+<th data-quarto-table-cell-role="th">Possession</th>
+<th data-quarto-table-cell-role="th">Shots</th>
+<th data-quarto-table-cell-role="th">Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">Last5_Win_Rate</th>
+<th data-quarto-table-cell-role="th">club_name</th>
+<th data-quarto-table-cell-role="th">Date_day</th>
+<th data-quarto-table-cell-role="th">Date_month</th>
+<th data-quarto-table-cell-role="th">Date_year</th>
+<th data-quarto-table-cell-role="th">Date_weekday</th>
+<th data-quarto-table-cell-role="th">Date_quarter</th>
+<th data-quarto-table-cell-role="th">Date_hour</th>
+<th data-quarto-table-cell-role="th">Date_minute</th>
+<th data-quarto-table-cell-role="th">Date_second</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Galatasaray</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>2</td>
+<td>55</td>
+<td>12</td>
+<td>5</td>
+<td>425</td>
+<td>80</td>
+<td>...</td>
+<td>0.00</td>
+<td>Arsenal</td>
+<td>4</td>
+<td>8</td>
+<td>2013</td>
+<td>6</td>
+<td>3</td>
+<td>18</td>
+<td>20</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Aston Villa</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>3</td>
+<td>64</td>
+<td>15</td>
+<td>4</td>
+<td>457</td>
+<td>87</td>
+<td>...</td>
+<td>0.00</td>
+<td>Arsenal</td>
+<td>17</td>
+<td>8</td>
+<td>2013</td>
+<td>5</td>
+<td>3</td>
+<td>17</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Fenerbahçe</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>60</td>
+<td>13</td>
+<td>7</td>
+<td>451</td>
+<td>84</td>
+<td>...</td>
+<td>0.33</td>
+<td>Arsenal</td>
+<td>21</td>
+<td>8</td>
+<td>2013</td>
+<td>2</td>
+<td>3</td>
+<td>21</td>
+<td>45</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Fulham</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>54</td>
+<td>19</td>
+<td>9</td>
+<td>496</td>
+<td>87</td>
+<td>...</td>
+<td>0.50</td>
+<td>Arsenal</td>
+<td>24</td>
+<td>8</td>
+<td>2013</td>
+<td>5</td>
+<td>3</td>
+<td>14</td>
+<td>45</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Fenerbahçe</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td>65</td>
+<td>14</td>
+<td>6</td>
+<td>460</td>
+<td>86</td>
+<td>...</td>
+<td>0.60</td>
+<td>Arsenal</td>
+<td>27</td>
+<td>8</td>
+<td>2013</td>
+<td>1</td>
+<td>3</td>
+<td>21</td>
+<td>45</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 38 columns</p>
+</div>
+</div>
+</div>
+<div id="c08e0736" class="cell" data-execution_count="50">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'Opponent'</span>].drop_duplicates().shape</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="50">
+<pre><code>(478,)</code></pre>
+</div>
+</div>
+<div id="e261c171" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(x<span class="op">=</span><span class="st">'Opponent_Possession'</span>, y<span class="op">=</span><span class="st">'Passes_Completed'</span>, data<span class="op">=</span>df_final, hue<span class="op">=</span><span class="st">'club_name'</span>,palette<span class="op">=</span><span class="st">'Set1'</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="premier_league_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="824c420e" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span><span class="st">'club_name'</span>, y<span class="op">=</span><span class="st">'Passes_Completed'</span>, data<span class="op">=</span>df_final, hue<span class="op">=</span><span class="st">'Is_Home'</span>,palette<span class="op">=</span><span class="st">'Set1'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="premier_league_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="a974a198" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'Is_Home'</span>]<span class="op">=</span>df_final[<span class="st">'Is_Home'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="50ea1bd2" class="cell" data-execution_count="33">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>sns.barplot(x<span class="op">=</span><span class="st">'club_name'</span>, y<span class="op">=</span><span class="st">'Goals'</span>,hue<span class="op">=</span><span class="st">'Is_Home'</span>, data<span class="op">=</span>df_final)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="premier_league_files/figure-html/cell-17-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="253e7c0d" class="cell" data-execution_count="79">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>sns.histplot(x<span class="op">=</span><span class="st">'Result'</span> ,data<span class="op">=</span>df_final, hue<span class="op">=</span><span class="st">'club_name'</span>,palette<span class="op">=</span><span class="st">'Set1'</span>,multiple<span class="op">=</span><span class="st">"dodge"</span>, )</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="premier_league_files/figure-html/cell-18-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="b11ea615" class="cell" data-execution_count="60">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> LabelEncoder</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Los 6 equipos principales</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>main_teams <span class="op">=</span> [</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Liverpool"</span>, <span class="st">"Chelsea"</span>, <span class="st">"Arsenal"</span>,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Manchester City"</span>, <span class="st">"Manchester United"</span>, <span class="st">"Tottenham"</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Unir todos los valores de ambas columnas</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>all_teams <span class="op">=</span> pd.concat([df_final[<span class="st">'club_name'</span>], df_final[<span class="st">'Opponent'</span>]]).unique()</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear el encoder y ajustarlo</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>encoder <span class="op">=</span> LabelEncoder()</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>encoder.fit(all_teams)</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Aplicar encoding a las columnas</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'club_name_enc'</span>] <span class="op">=</span> encoder.transform(df_final[<span class="st">'club_name'</span>])</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>df_final[<span class="st">'opponent_enc'</span>]  <span class="op">=</span> encoder.transform(df_final[<span class="st">'Opponent'</span>])</span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>df_final <span class="op">=</span> df_final.drop(columns<span class="op">=</span>[<span class="st">'club_name'</span>,<span class="st">'Opponent'</span>])</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear diccionario con los 6 equipos principales y su número</span></span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>main_team_labels <span class="op">=</span> {team: encoder.transform([team])[<span class="dv">0</span>] <span class="cf">for</span> team <span class="kw">in</span> main_teams}</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"📌 Labels de los equipos principales:"</span>)</span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(main_team_labels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>📌 Labels de los equipos principales:
+{'Liverpool': np.int64(219), 'Chelsea': np.int64(100), 'Arsenal': np.int64(18), 'Manchester City': np.int64(237), 'Manchester United': np.int64(239), 'Tottenham': np.int64(418)}</code></pre>
+</div>
+</div>
+<div id="c613e1df" class="cell" data-execution_count="61">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>df_final.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="61">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Is_Home</th>
+<th data-quarto-table-cell-role="th">Result</th>
+<th data-quarto-table-cell-role="th">Goals</th>
+<th data-quarto-table-cell-role="th">Opponent_Goals</th>
+<th data-quarto-table-cell-role="th">Possession</th>
+<th data-quarto-table-cell-role="th">Shots</th>
+<th data-quarto-table-cell-role="th">Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Corners</th>
+<th data-quarto-table-cell-role="th">Crosses</th>
+<th data-quarto-table-cell-role="th">Fouls</th>
+<th data-quarto-table-cell-role="th">Offsides</th>
+<th data-quarto-table-cell-role="th">Opponent_Possession</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots</th>
+<th data-quarto-table-cell-role="th">Opponent_Shots_On_Target</th>
+<th data-quarto-table-cell-role="th">Opponent_Passes_Completed</th>
+<th data-quarto-table-cell-role="th">Opponent_Pass_Accuracy</th>
+<th data-quarto-table-cell-role="th">Opponent_Corners</th>
+<th data-quarto-table-cell-role="th">Opponent_Crosses</th>
+<th data-quarto-table-cell-role="th">Opponent_Fouls</th>
+<th data-quarto-table-cell-role="th">Opponent_Offsides</th>
+<th data-quarto-table-cell-role="th">Shot_Efficiency</th>
+<th data-quarto-table-cell-role="th">Season</th>
+<th data-quarto-table-cell-role="th">Month</th>
+<th data-quarto-table-cell-role="th">Day_of_Week</th>
+<th data-quarto-table-cell-role="th">Last5_Avg_Goals</th>
+<th data-quarto-table-cell-role="th">Last5_Win_Rate</th>
+<th data-quarto-table-cell-role="th">Date_day</th>
+<th data-quarto-table-cell-role="th">Date_month</th>
+<th data-quarto-table-cell-role="th">Date_year</th>
+<th data-quarto-table-cell-role="th">Date_weekday</th>
+<th data-quarto-table-cell-role="th">Date_quarter</th>
+<th data-quarto-table-cell-role="th">Date_hour</th>
+<th data-quarto-table-cell-role="th">Date_minute</th>
+<th data-quarto-table-cell-role="th">Date_second</th>
+<th data-quarto-table-cell-role="th">club_name_enc</th>
+<th data-quarto-table-cell-role="th">opponent_enc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>2</td>
+<td>55</td>
+<td>12</td>
+<td>5</td>
+<td>425</td>
+<td>80</td>
+<td>4</td>
+<td>2</td>
+<td>12</td>
+<td>2</td>
+<td>45</td>
+<td>12</td>
+<td>6</td>
+<td>399</td>
+<td>81</td>
+<td>5</td>
+<td>3</td>
+<td>15</td>
+<td>2</td>
+<td>0.416667</td>
+<td>2013</td>
+<td>8</td>
+<td>7</td>
+<td>1.000000</td>
+<td>0.00</td>
+<td>4</td>
+<td>8</td>
+<td>2013</td>
+<td>6</td>
+<td>3</td>
+<td>18</td>
+<td>20</td>
+<td>0</td>
+<td>18</td>
+<td>159</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>-1</td>
+<td>1</td>
+<td>3</td>
+<td>64</td>
+<td>15</td>
+<td>4</td>
+<td>457</td>
+<td>87</td>
+<td>4</td>
+<td>4</td>
+<td>15</td>
+<td>3</td>
+<td>36</td>
+<td>10</td>
+<td>5</td>
+<td>216</td>
+<td>71</td>
+<td>3</td>
+<td>2</td>
+<td>19</td>
+<td>1</td>
+<td>0.266667</td>
+<td>2013</td>
+<td>8</td>
+<td>6</td>
+<td>1.000000</td>
+<td>0.00</td>
+<td>17</td>
+<td>8</td>
+<td>2013</td>
+<td>5</td>
+<td>3</td>
+<td>17</td>
+<td>0</td>
+<td>0</td>
+<td>18</td>
+<td>23</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>0</td>
+<td>60</td>
+<td>13</td>
+<td>7</td>
+<td>451</td>
+<td>84</td>
+<td>6</td>
+<td>2</td>
+<td>14</td>
+<td>0</td>
+<td>40</td>
+<td>6</td>
+<td>2</td>
+<td>350</td>
+<td>79</td>
+<td>5</td>
+<td>2</td>
+<td>15</td>
+<td>1</td>
+<td>0.538462</td>
+<td>2013</td>
+<td>8</td>
+<td>3</td>
+<td>1.666667</td>
+<td>0.33</td>
+<td>21</td>
+<td>8</td>
+<td>2013</td>
+<td>2</td>
+<td>3</td>
+<td>21</td>
+<td>45</td>
+<td>0</td>
+<td>18</td>
+<td>146</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0</td>
+<td>1</td>
+<td>3</td>
+<td>1</td>
+<td>54</td>
+<td>19</td>
+<td>9</td>
+<td>496</td>
+<td>87</td>
+<td>8</td>
+<td>9</td>
+<td>9</td>
+<td>0</td>
+<td>46</td>
+<td>16</td>
+<td>7</td>
+<td>421</td>
+<td>87</td>
+<td>1</td>
+<td>1</td>
+<td>10</td>
+<td>3</td>
+<td>0.473684</td>
+<td>2013</td>
+<td>8</td>
+<td>6</td>
+<td>2.000000</td>
+<td>0.50</td>
+<td>24</td>
+<td>8</td>
+<td>2013</td>
+<td>5</td>
+<td>3</td>
+<td>14</td>
+<td>45</td>
+<td>0</td>
+<td>18</td>
+<td>156</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>0</td>
+<td>65</td>
+<td>14</td>
+<td>6</td>
+<td>460</td>
+<td>86</td>
+<td>2</td>
+<td>4</td>
+<td>16</td>
+<td>2</td>
+<td>35</td>
+<td>6</td>
+<td>4</td>
+<td>350</td>
+<td>79</td>
+<td>3</td>
+<td>4</td>
+<td>16</td>
+<td>1</td>
+<td>0.428571</td>
+<td>2013</td>
+<td>8</td>
+<td>2</td>
+<td>2.000000</td>
+<td>0.60</td>
+<td>27</td>
+<td>8</td>
+<td>2013</td>
+<td>1</td>
+<td>3</td>
+<td>21</td>
+<td>45</td>
+<td>0</td>
+<td>18</td>
+<td>147</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
