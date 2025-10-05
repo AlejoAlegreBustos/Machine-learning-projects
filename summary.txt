@@ -1,3 +1,6 @@
 the main idea for this repo is to have a place where I can save and show my projects in future opportunities
 
 I will be writting a report of alll my projects here with their stats.
+
+
+...
