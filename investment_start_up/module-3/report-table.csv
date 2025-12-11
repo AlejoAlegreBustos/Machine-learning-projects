@@ -1,0 +1,11 @@
+﻿start-up-id,startup_name,founded_year,country,region,industry,funding_round,funding_amount_usd,funding_date,lead_investor,co_investors,employee_count,estimated_revenue_usd,estimated_valuation_usd,exited,exit_type,tags
+STP-001,AgroVision AI,2020,United States,California,AgriTech,Series A,"3,500,000",03/10/2024,Sequoia Capital,"Accel, SoftBank",42,"1,200,000","15,000,000",No,—,"AI, agriculture, sustainability"
+STP-002,HealthNova,2019,United States,New York,HealthTech,Seed,"1,200,000",05/05/2023,Y Combinator,"GV, Kleiner Perkins",18,"850,000","5,000,000",No,—,"healthcare, app, diagnostics"
+STP-003,FinEdge,2018,Canada,Ontario,FinTech,Series B,"7,800,000",06/15/2024,Andreessen Horowitz,Tiger Global,60,"3,100,000","28,000,000",No,—,"finance, SaaS, analytics"
+STP-004,GreenHive Energy,2021,Germany,Bavaria,CleanTech,Series A,"2,900,000",07/28/2024,Energy Impact Partners,Shell Ventures,35,"900,000","12,000,000",No,—,"renewable, energy, AI"
+STP-005,EduBridge,2017,United Kingdom,London,EdTech,Series C,"15,000,000",04/14/2023,Insight Partners,"Owl Ventures, GSV",110,"6,500,000","80,000,000",Yes,Acquisition,"education, platform, learning"
+STP-006,FoodChainX,2020,United States,Texas,Supply Chain,Series A,"4,500,000",08/02/2024,Bessemer Venture Partners,Lightspeed,50,"2,000,000","18,500,000",No,—,"logistics, blockchain, food"
+STP-007,BioSense Labs,2019,Switzerland,Zürich,Biotech,Series B,"6,200,000",05/09/2024,Novo Holdings,Sofinnova Partners,70,"3,800,000","30,000,000",No,—,"biotech, research, health"
+STP-008,AutoStream,2018,Japan,Tokyo,Mobility,Series C,"9,800,000",09/18/2024,Toyota Ventures,"Denso, Mitsubishi",130,"10,000,000","95,000,000",Yes,IPO,"automotive, AI, automation"
+STP-009,CloudNest,2016,United States,Washington,Cloud Computing,Series D,"25,000,000",02/27/2024,Salesforce Ventures,"Insight, a16z",220,"18,000,000","150,000,000",Yes,Acquisition,"SaaS, cloud, infrastructure"
+STP-010,AgroData Analytics,2022,Argentina,Buenos Aires,AgriTech,Seed,"800,000",10/01/2024,NXTP Ventures,Kamay Ventures,15,"400,000","3,000,000",No,—,"agriculture, AI, data"

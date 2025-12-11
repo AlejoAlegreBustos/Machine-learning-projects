@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+xgboost
+pydantic
+numpy
+matplotlib
+reportlab
+scikit-learn
+supabase
+python-dotenv
